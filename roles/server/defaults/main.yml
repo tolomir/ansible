@@ -1,0 +1,6 @@
+mysql_root_pass: madm
+wp_mysql_db: wordpress
+wp_mysql_user: wordpress
+wp_mysql_password: madm
+wp_mysql_host: 192.168.1.45
+

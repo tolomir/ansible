@@ -1,0 +1,13 @@
+---
+- hosts: wordpress
+  roles:
+    - server
+    - wordpress
+
+- hosts: mysql
+  roles:
+    - mysql
+
+- hosts:  haserver
+  roles:
+    - haserver

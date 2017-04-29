@@ -1,0 +1,46 @@
+---
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+  sudo: yes
+
+- name: Set MySQL root password before installing
+  debconf: name='mysql-server' question='mysql-server/root_password' value='{{mysql_root_pass | quote}}' vtype='password'
+  sudo: yes
+
+- name: Confirm MySQL root password before installing
+  debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{mysql_root_pass | quote}}' vtype='password'
+  sudo: yes
+
+- name: Install required software
+  apt: name={{ item }} state=present
+  sudo: yes
+  with_items:
+    - mysql-server-5.5
+    - php5
+    - php5-mysql
+    - python-mysqldb
+
+- name: Create mysql database
+  mysql_db: name={{ wp_mysql_db }} state=present
+    login_user=root
+    login_password={{ mysql_root_pass }}
+
+- name: Create mysql user
+  mysql_user: 
+    name={{ wp_mysql_user }} 
+    password={{ wp_mysql_password }} 
+    priv="*.*:ALL,GRANT"
+    host=%
+    login_user=root
+    login_password={{ mysql_root_pass }}
+
+- name: Configure mysql 
+  sudo: yes
+  template:
+    src=my.cnf
+    dest=/etc/mysql/my.cnf
+    owner=root
+    group=root
+    mode=0644
+  notify: restart mysql   
+
